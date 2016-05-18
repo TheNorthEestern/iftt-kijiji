@@ -1,6 +1,13 @@
-import feedparser
+import feedparser, datetime
 from flask import request, jsonify, abort
 from flask.views import MethodView
+
+
+def iso8601_to_epoch(iso_time):
+    """Converts a W3-style ISO 8601 UTC timestamp to an integer number of seconds since epoch"""
+    dt = datetime.datetime.strptime(iso_time, '%Y-%m-%dT%H:%M:%SZ')
+    epoch = datetime.datetime.utcfromtimestamp(0)
+    return int((dt - epoch).total_seconds())
 
 class RecentPostsView(MethodView):
 
@@ -28,12 +35,19 @@ class RecentPostsView(MethodView):
 			if i > limit:
 				break
 			post = {}
+			print type(entry)
 			post['title'] = entry.title
 			post['created_at'] = entry.updated
 			post['description'] = entry.description
 			post['meta'] = {
         		"id": entry.guid,
-        		"timestamp": 1383597267 # TODO: timestamp properly!
+        		"timestamp": iso8601_to_epoch(entry.date)
       		}
 			self.posts.append(post)
+
+# if __name__ == "__main__":
+#     test = RecentPostsView()
+#     test.rss_url = 'http://www.kijiji.ca/rss-srp-classic-cars/city-of-toronto/convertible/c122l1700273a161'
+#     test.get_posts(10)
+#     print test.posts
 
