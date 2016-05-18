@@ -1,21 +1,32 @@
-import feedparser, requests
-from bs4 import BeautifulSoup
+import feedparser
+from flask import request, jsonify, abort
+from flask.views import MethodView
 
-class RecentPosts:
+class RecentPostsView(MethodView):
+
+	default_limit = 50
+
 	def __init__(self):
 		self.posts = []
-		self.base_url = 'http://www.kijiji.ca'
 		self.rss_url = None
 
-	def get_rss_url(self, query_url):
-		html = requests.get(query_url)
-		soup = BeautifulSoup(html.text, 'html.parser')
-		link_tag = soup.find_all('link', type = 'application/rss+xml')[0]
-		self.rss_url =  self.base_url + link_tag['href']
+	def post(self):
+		params = request.get_json(force=True, silent=True) or {}
+		trigger_fields = params.get('triggerFields', {})
+		self.rss_url = trigger_fields.get('search_url')
+		if not self.rss_url:
+			abort(400)
+		limit = params.get('limit', self.default_limit)
+		self.get_posts(limit)
+		return jsonify(data=self.posts)
 
-	def get_posts(self):
+	def get_posts(self, limit):
 		entries = feedparser.parse(self.rss_url).entries
+		i = 0
 		for entry in entries:
+			i += 1
+			if i > limit:
+				break
 			post = {}
 			post['title'] = entry.title
 			post['created_at'] = entry.updated
@@ -26,9 +37,3 @@ class RecentPosts:
       		}
 			self.posts.append(post)
 
-url = 'http://www.kijiji.ca/b-classic-cars/city-of-toronto/convertible/c122l1700273a161'
-test = RecentPosts()
-test.get_rss_url(url)
-test.get_posts()
-
-print test.posts
