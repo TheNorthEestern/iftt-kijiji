@@ -38,7 +38,7 @@ def status():
 def test_setup():
     """Required by the IFTTT endpoint test suite."""
     ret = {'samples': {'triggers': {
-    	'new_post_by_search_url': {'search_url': 'http://www.kijiji.ca/rss-srp-classic-cars/city-of-toronto/convertible/c122l1700273a161'}
+    	'new_post_by_search_url': {'search_url': 'http://www.kijiji.ca/b-classic-cars/city-of-toronto/convertible/c122l1700273a161'}
     }}}
     return jsonify(data=ret)
 
