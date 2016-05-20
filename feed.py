@@ -49,16 +49,17 @@ class RecentPostsView(MethodView):
 			post['title'] = entry.title
 			post['created_at'] = entry.updated
 			post['description'] = entry.description
+			post['link'] = entry.guid
 			post['meta'] = {
         		"id": entry.guid,
         		"timestamp": iso8601_to_epoch(entry.date)
       		}
 			self.posts.append(post)
 
-# if __name__ == "__main__":
-#     test = RecentPostsView()
-#     test.rss_url = test.get_rss_url('http://www.kijiji.ca/b-storage-parking/city-of-toronto/c39l1700273?ad=wanted&more-info=storage')
-#     print test.rss_url
-#     test.get_posts(10)
-#     print test.posts
+if __name__ == "__main__":
+    test = RecentPostsView()
+    test.rss_url = test.get_rss_url('http://www.kijiji.ca/b-storage-parking/city-of-toronto/c39l1700273?ad=wanted&more-info=storage')
+    print test.rss_url
+    test.get_posts(10)
+    print test.posts
 
